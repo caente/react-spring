@@ -2,7 +2,6 @@ import React from 'react';
 import {Alert, Button} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {CoffeeShop} from './models';
-import NavBar from './NavBar';
 
 interface CoffeeShopRemovable extends CoffeeShop {
   remove(id: number): Promise<void>
@@ -28,77 +27,72 @@ const CoffeeShopComponent = (props: CoffeeShopRemovable) => (
 );
 
 
-interface CoffeeShopsListProps {api: any, navbar: NavBar}
+interface CoffeeShopsListProps {api: any, navbar: React.ReactElement}
 interface CoffeeShopsListState {coffeeShops: CoffeeShop[], isLoading: boolean, errorMessage?: string}
+const emptyState: CoffeeShopsListState = {coffeeShops: [], isLoading: true};
 
-class CoffeeShopsList extends React.Component<CoffeeShopsListProps, CoffeeShopsListState> {
+const CoffeeShopsList: React.FunctionComponent<CoffeeShopsListProps> = props => {
 
-  constructor(props: CoffeeShopsListProps) {
-    super(props);
-    this.state = {
-      coffeeShops: [],
-      isLoading: true
-    };
-    this.remove = this.remove.bind(this);
-  }
+  const [state, setState] = React.useState(emptyState);
 
-  async componentDidMount() {
-    this.setState({isLoading: true});
-    const response = await this.props.api.getAll();
-    if (!response.ok) {
-      this.setState({
-        errorMessage: `Failed to load coffee shops: ${response.status} ${response.statusText}`,
-        isLoading: false
+  React.useEffect(() => {
+    setState(prevState => ({...prevState, isLoading: true}));
+    const execute = async () => {
+      const response = await props.api.getAll();
+      if (!response.ok) {
+        setState(prevState => ({
+          ...prevState,
+          errorMessage: `Failed to load coffee shops: ${response.status} ${response.statusText}`,
+          isLoading: false
+        }
+        ));
       }
-      )
+      else {
+        const body = await response.json();
+        const coffeeShops = body._embedded.coffeeshops;
+        setState(prevState => ({
+          ...prevState,
+          coffeeShops: coffeeShops,
+          isLoading: false
+        }));
+      }
     }
-    else {
-      const body = await response.json();
-      const coffeeShops = body._embedded.coffeeshops;
-      this.setState({
-        coffeeShops: coffeeShops,
-        isLoading: false
-      });
-    }
-  }
+    execute();
+  }, []);
 
-  async remove(id: number) {
-    let response = await this.props.api.delete(id);
+  const remove = async (id: number) => {
+    let response = await props.api.delete(id);
     if (!response.ok) {
-      this.setState({errorMessage: `Failed to delete coffee shop: ${response.status} ${response.statusText}`})
+      setState(prevState => ({...prevState, errorMessage: `Failed to delete coffee shop: ${response.status} ${response.statusText}`}));
     }
     else {
-      let updatedCoffeeShops = [...this.state.coffeeShops].filter(i => i.id !== id);
-      this.setState({coffeeShops: updatedCoffeeShops});
+      let updatedCoffeeShops = state.coffeeShops.filter(i => i.id !== id);
+      setState(prevState => ({...prevState, coffeeShops: updatedCoffeeShops}));
     }
   }
 
-  render() {
-    const {coffeeShops, isLoading, errorMessage} = this.state;
-
-    if (isLoading) {
-      return <p>Loading...</p>;
-    }
-
+  if (state.isLoading) {
+    return <p>Loading...</p>;
+  } else {
     return (
       <div>
-        {this.props.navbar}
+        {props.navbar}
         <div className="d-flex flex-row justify-content-between p-3">
           <h3 className="coffee-shops-title">Coffee Shops</h3>
           <Button color="success" tag={Link} to="/coffee-shops/new">Add New</Button>
         </div>
-        {errorMessage ?
+        {state.errorMessage ?
           <div className="d-flex flex-row justify-content-center">
             <Alert color="warning" style={{flex: 1, maxWidth: '80%'}}>
-              {errorMessage}
+              {state.errorMessage}
             </Alert>
           </div> : null
         }
         <div className="d-flex flex-row flex-container flex-wrap justify-content-center">
-          {coffeeShops.map(coffeeShop =>
-            <CoffeeShopComponent {...coffeeShop} remove={this.remove.bind(this)} key={coffeeShop.id} />
+          {state.coffeeShops.map(coffeeShop =>
+            <CoffeeShopComponent {...coffeeShop} remove={remove.bind(this)} key={coffeeShop.id} />
           )}
-          {!coffeeShops || coffeeShops.length === 0 ? <p>No coffee shops!</p> : null}
+          {!state.coffeeShops || state.coffeeShops.length === 0 ? <p>No coffee shops!</p> : null}
         </div>
       </div>
     );
