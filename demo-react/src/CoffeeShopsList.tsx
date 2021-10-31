@@ -58,7 +58,7 @@ const CoffeeShopsList: React.FunctionComponent<CoffeeShopsListProps> = props => 
       }
     }
     execute();
-  }, []);
+  }, [props.api]);
 
   const remove = async (id: number) => {
     let response = await props.api.delete(id);
