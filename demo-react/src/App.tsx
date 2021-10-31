@@ -1,20 +1,10 @@
 import React from 'react';
 import './App.css';
-
-interface CoffeeShop{
-    id: number;
-    name: string;
-    address: string;
-    internetReliability: number;
-    phone: string;
-    powerAccessible: boolean;
-    priceOfCoffee: number;
-
-}
+import {CoffeeShop} from './models';
 
 interface State {
-    isLoading: boolean;
-    coffeeShops: CoffeeShop[];
+  isLoading: boolean;
+  coffeeShops: CoffeeShop[];
 }
 
 class App extends React.Component {
