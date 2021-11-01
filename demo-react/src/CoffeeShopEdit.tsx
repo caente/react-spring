@@ -3,11 +3,12 @@ import {Link, withRouter} from 'react-router-dom';
 import {Alert, Button, Container, Form, FormGroup, Input, Label} from 'reactstrap';
 import {CoffeeShop} from './models';
 import {RouteComponentProps} from 'react-router';
+import {Api} from './Api';
 
 
 interface CustomProps {
   navbar: React.ReactElement;
-  api: any;
+  api: Api;
 }
 
 interface Params {
@@ -54,7 +55,7 @@ const CoffeeShopEdit: React.FunctionComponent<Props> = props => {
     setState(prevState => ({...prevState, isCreate}));
     const getData = async () => {
       if (!state.isCreate) {
-        const response = await props.api.getById(props.match.params.id);
+        const response = await props.api.getById(props.match.params.id as unknown as number);
         const coffeeShop = await response.json();
         setState(prevState => ({...prevState, item: coffeeShop}));
       }

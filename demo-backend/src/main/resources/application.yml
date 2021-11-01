@@ -9,3 +9,8 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: update
+
+okta:
+  oauth2:
+    issuer: https://dev-63669975.okta.com/oauth2/default
+    clientId: 0oa2gfjz71LnTQhAg5d7

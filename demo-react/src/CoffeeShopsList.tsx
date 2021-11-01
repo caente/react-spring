@@ -2,6 +2,7 @@ import React from 'react';
 import {Alert, Button} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {CoffeeShop} from './models';
+import {Api} from './Api';
 
 interface CoffeeShopRemovable extends CoffeeShop {
   remove(id: number): Promise<void>
@@ -27,11 +28,14 @@ const CoffeeShopComponent = (props: CoffeeShopRemovable) => (
 );
 
 
-interface CoffeeShopsListProps {api: any, navbar: React.ReactElement}
+interface Props {
+  api: Api,
+  navbar: React.ReactElement;
+}
 interface CoffeeShopsListState {coffeeShops: CoffeeShop[], isLoading: boolean, errorMessage?: string}
 const emptyState: CoffeeShopsListState = {coffeeShops: [], isLoading: true};
 
-const CoffeeShopsList: React.FunctionComponent<CoffeeShopsListProps> = props => {
+const CoffeeShopsList: React.FunctionComponent<Props> = props => {
 
   const [state, setState] = React.useState(emptyState);
 
