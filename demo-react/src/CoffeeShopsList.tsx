@@ -47,6 +47,7 @@ const CoffeeShopsList: React.FunctionComponent<Props> = props => {
         setState(prevState => ({
           ...prevState,
           errorMessage: `Failed to load coffee shops: ${response.status} ${response.statusText}`,
+          coffeeShops: [],
           isLoading: false
         }
         ));

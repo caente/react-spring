@@ -22,14 +22,16 @@ const defaultApi = new Api("");
 const AuthWrapper: React.FunctionComponent = () => {
   const history = useHistory();
   const restoreOriginalUri = async (_oktaAuth: string, originalUri: string) => {
-    history.replace(toRelativeUrl(originalUri || '/', window.location.origin));
+    history?.replace(toRelativeUrl(originalUri || '/', window.location.origin));
   };
 
   return (
-    <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
-      <SecureRoute path='/' component={Protected} />
-      <Route path='/callback' component={LoginCallback} />
-    </Security>
+    <Router>
+      <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
+        <SecureRoute path='/' component={Protected} />
+        <Route path='/callback' component={LoginCallback} />
+      </Security>
+    </Router>
   );
 }
 
@@ -66,29 +68,23 @@ const Protected: React.FunctionComponent = () => {
     logout={logout.bind(this)}
   />;
   return (
-      <Switch>
-        <Route
-          path='/'
-          exact={true}
-          render={(props) => <Home {...props} user={state.user} authenticated={state.authenticated} api={state.api} navbar={navbar} />}
-        />
-        <Route
-          path='/coffee-shops'
-          exact={true}
-          render={(props) => <CoffeeShopsList {...props} api={state.api} navbar={navbar} />}
-        />
-        <Route
-          path='/coffee-shops/:id'
-          render={(props) => <CoffeeShopEdit {...props} api={state.api} navbar={navbar} />}
-        />
-      </Switch>
+    <Switch>
+      <Route
+        path='/'
+        exact={true}
+        render={(props) => <Home {...props} user={state.user} authenticated={state.authenticated} api={state.api} navbar={navbar} />}
+      />
+      <SecureRoute
+        path='/coffee-shops'
+        exact={true}
+        render={(props: any) => <CoffeeShopsList {...props} api={state.api} navbar={navbar} />}
+      />
+      <SecureRoute
+        path='/coffee-shops/:id'
+        render={(props: any) => <CoffeeShopEdit {...props} api={state.api} navbar={navbar} />}
+      />
+    </Switch>
   )
 }
 
-const AppWithRouterAccess = () => (
-  <Router>
-    <AuthWrapper />
-  </Router>
-);
-
-export default AppWithRouterAccess;
+export default AuthWrapper;
