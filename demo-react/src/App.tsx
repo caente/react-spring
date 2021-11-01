@@ -28,8 +28,8 @@ const AuthWrapper: React.FunctionComponent = () => {
   return (
     <Router>
       <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
-        <SecureRoute path='/' component={Protected} />
         <Route path='/callback' component={LoginCallback} />
+        <Protected />
       </Security>
     </Router>
   );
@@ -42,9 +42,9 @@ const Protected: React.FunctionComponent = () => {
   const login = async () => oktaAuth.signInWithRedirect();
   const logout = async () => oktaAuth.signOut('/');
 
-  const authenticated = authState.isAuthenticated;
+  const authenticated = authState?.isAuthenticated || null;
   function checkAuthentication() {
-    if (authenticated !== state.authenticated) {
+    if (authenticated) {
       const createState = async () => {
         const user = await oktaAuth.getUser();
         let accessToken: string = await oktaAuth.getAccessToken();
@@ -56,7 +56,7 @@ const Protected: React.FunctionComponent = () => {
 
   useEffect(() => {
     checkAuthentication()
-  }, []);
+  });
 
   useEffect(() => {
     checkAuthentication()
