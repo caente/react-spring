@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {BrowserRouter as Router, Switch, Route, useHistory} from 'react-router-dom';
+import {Switch, Route, useHistory} from 'react-router-dom';
 import {Api} from './Api';
 import './App.css';
 import CoffeeShopEdit from './CoffeeShopEdit';
