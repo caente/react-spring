@@ -22,16 +22,14 @@ const defaultApi = new Api("");
 const AuthWrapper: React.FunctionComponent = () => {
   const history = useHistory();
   const restoreOriginalUri = async (_oktaAuth: string, originalUri: string) => {
-    history?.replace(toRelativeUrl(originalUri || '/', window.location.origin));
+    history.replace(toRelativeUrl(originalUri || '/', window.location.origin));
   };
 
   return (
-    <Router>
-      <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
-        <Route path='/callback' component={LoginCallback} />
-        <Protected />
-      </Security>
-    </Router>
+    <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
+      <Route path='/callback' component={LoginCallback} />
+      <Protected />
+    </Security>
   );
 }
 
@@ -39,8 +37,8 @@ const Protected: React.FunctionComponent = () => {
   const {oktaAuth, authState} = useOktaAuth();
   const [state, setState] = useState({authenticated: null, user: null, api: defaultApi})
 
-  const login = async () => oktaAuth.signInWithRedirect();
-  const logout = async () => oktaAuth.signOut('/');
+  const login = async () => oktaAuth.signInWithRedirect('/');
+  const logout = async () => oktaAuth.signOut({originalUri: '/'});
 
   const authenticated = authState?.isAuthenticated || null;
   function checkAuthentication() {
@@ -53,10 +51,6 @@ const Protected: React.FunctionComponent = () => {
       createState();
     }
   }
-
-  useEffect(() => {
-    checkAuthentication()
-  });
 
   useEffect(() => {
     checkAuthentication()
